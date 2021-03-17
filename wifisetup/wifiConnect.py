@@ -8,7 +8,8 @@ network={
     ssid="WIFI-SSID"
     scan_ssid=1
     key_mgmt=NONE
-}"""
+}
+WIFI-COUNTRY"""
 
 wepWifi = """
 
@@ -17,7 +18,8 @@ network={
     scan_ssid=1
     key_mgmt=NONE
     wep_key0="WIFI-PSK"
-}"""
+}
+WIFI-COUNTRY"""
 
 wpaWifi = """
 
@@ -26,19 +28,26 @@ network={
     scan_ssid=1
     key_mgmt=WPA-PSK
     psk="WIFI-PSK"
-}"""
+}
+WIFI-COUNTRY"""
 
 wifiSSID = sys.argv[1]
 wifiPSK = sys.argv[2]
 wifiType = sys.argv[3]
+wifiCountry = ""
+if len(sys.argv) > 3 and sys.argv[4] != "":
+    if "-" in sys.argv[4] and sys.argv[4][0:sys.argv[4].find("-")] != "":
+        wifiCountry = "country=" + sys.argv[4][0:sys.argv[4].find("-")]
+    else:
+        wifiCountry = ""
 
 if wifiSSID != "" and wifiType != "":
 	if wifiPSK == "" or wifiType == "Open (no password)":
-		wifiText = openWifi.replace("WIFI-SSID", wifiSSID)
+		wifiText = openWifi.replace("WIFI-SSID", wifiSSID).replace("WIFI-COUNTRY", wifiCountry)
 	elif wifiType == "WEP":
-		wifiText = wepWifi.replace("WIFI-SSID", wifiSSID).replace("WIFI-PSK", wifiPSK)
+		wifiText = wepWifi.replace("WIFI-SSID", wifiSSID).replace("WIFI-PSK", wifiPSK).replace("WIFI-COUNTRY", wifiCountry)
 	elif wifiType == "WPA/WPA2":
-		wifiText = wpaWifi.replace("WIFI-SSID", wifiSSID).replace("WIFI-PSK", wifiPSK)
+		wifiText = wpaWifi.replace("WIFI-SSID", wifiSSID).replace("WIFI-PSK", wifiPSK).replace("WIFI-COUNTRY", wifiCountry)
 
 with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifiFile:
 	wifiFile.write(wifiText)
